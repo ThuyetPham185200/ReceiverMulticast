@@ -52,46 +52,55 @@
 #include "receiver.h"
 #include <iostream>
 #include <fstream>
-Receiver::Receiver(QObject *parent)
+
+MulticastReceiver::MulticastReceiver(QObject *parent)
     : QObject(parent)
 {
     this->count_ = 0;
 }
 ///////////////////////////////////////////////////////////////////////
-void Receiver::getInfor(QString gAddress, QString port)
+MulticastReceiver::~MulticastReceiver()
 {
-    udpSocket = new QUdpSocket(this);
-    groupAddress =  QHostAddress(gAddress);
-    int n = port.toInt();
-    udpSocket->bind(QHostAddress::AnyIPv4, n, QUdpSocket::ShareAddress);
-    udpSocket->joinMulticastGroup(groupAddress);
-    connect(udpSocket, SIGNAL(readyRead()),
+    delete this->udpSocket_;
+    this->udpSocket_ = nullptr;
+}
+///////////////////////////////////////////////////////////////////////
+void MulticastReceiver::getInfor(QString gAddress, QString port)
+{
+    this->udpSocket_ = new QUdpSocket(this);
+    this->groupAddress_ =  QHostAddress(gAddress);
+    int n_ = port.toInt();
+    this->udpSocket_->bind(QHostAddress::AnyIPv4, n_, QUdpSocket::ShareAddress);
+    this->udpSocket_->joinMulticastGroup(groupAddress_);
+    connect(this->udpSocket_, SIGNAL(readyRead()),
             this, SLOT(processPendingDatagrams()));
 }
 ///////////////////////////////////////////////////////////////////////
-void Receiver::processPendingDatagrams()
+void MulticastReceiver::processPendingDatagrams()
 {
-    while (udpSocket->hasPendingDatagrams()) {
-        QByteArray datagram;
-        datagram.resize(udpSocket->pendingDatagramSize());
-        udpSocket->readDatagram(datagram.data(), datagram.size());
-        std::vector<unsigned char> dataFrame_(
-            datagram.begin(), datagram.end());
-
-        for (auto e : dataFrame_)
+    while (this->udpSocket_->hasPendingDatagrams()) {
+        QByteArray datagram_;
+        datagram_.resize(this->udpSocket_->pendingDatagramSize());
+        udpSocket_->readDatagram(datagram_.data(), datagram_.size());
+        //qDebug(datagram_);
+        std::vector<unsigned char> dataFrame_(datagram_.begin(), datagram_.end());
+        this->count_ += 1;
+        if (this->count_ == 1)
         {
-            count_ += 1;
-            printf("%02x ", e);
-            if(count_ % 16 == 0) printf("\n");
+            for (auto e : dataFrame_)
+            {
+                count_ += 1;
+                printf("%02x ", e);
+                if(count_ % 16 == 0) printf("\n");
+            }
         }
-//        this->count_ +=1;
-//       printf("length of dataFrame: %d\n id: %d\n", dataFrame_.size(), this->count_);
-
-        this->logData(dataFrame_);
+//       this->count_ +=1;
+       //printf("length of dataFrame: %d\n id: %d\n", dataFrame_.size(), this->count_);
+       this->logData(dataFrame_);
     }
 }
 ///////////////////////////////////////////////////////////////////////
-void Receiver::logData(std::vector<unsigned char> data)
+void MulticastReceiver::logData(std::vector<unsigned char> data)
 {
     std::ofstream myFile_ ("dataFrame.bin", std::ios::out | std::ios::binary);
     myFile_.write ((const char*)&data.front(), data.size());

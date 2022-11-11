@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     QGuiApplication app(argc, argv);
-    qmlRegisterType<Receiver>("thuyet.receiver.com", 1, 0,"Receiver");
+    qmlRegisterType<MulticastReceiver>("thuyet.receiver.com", 1, 0,"Receiver");
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

@@ -56,21 +56,21 @@
 #include <QUdpSocket>
 #include <mythread.h>
 
-class Receiver : public QObject
+class MulticastReceiver : public QObject
 {
     Q_OBJECT
 
 public:
-    Receiver(QObject* parent = nullptr);
+    MulticastReceiver(QObject* parent = nullptr);
+    ~MulticastReceiver();
     Q_INVOKABLE void getInfor(QString gAddress, QString port);
-    Q_INVOKABLE void processPendingDatagrams();
     void logData(std::vector<unsigned char> data);
 
 private slots:
-
+    void processPendingDatagrams();
 private:
-    QUdpSocket *udpSocket;
-    QHostAddress groupAddress;
+    QUdpSocket *udpSocket_;
+    QHostAddress groupAddress_;
     int count_;
 };
 

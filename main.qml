@@ -10,19 +10,16 @@ Window {
     visible: true
     title: qsTr("Receiver")
 
-
     Receiver {
         id: receiver
     }
-
-
     TextField {
         id: textGroupAddr
         x: 113
         y: 168
         width: 284
         height: 40
-        text: qsTr("239.255.43.21")
+        text: qsTr("224.1.1.6")
     }
     TextField {
         id: textPort
@@ -30,32 +27,17 @@ Window {
         y: 108
         width: 284
         height: 40
-        text: qsTr("45454")
-    }
-    TextField {
-        id: textData
-        x: 113
-        y: 228
-        width: 284
-        height: 40
-        text: qsTr("Show data")
+        text: qsTr("10669")
     }
     Button {
         id: choosebtn
         x: 447
         y: 168
-        text: qsTr("Chosen")
+        text: qsTr("Start")
         onClicked: {
             receiver.getInfor(textGroupAddr.text, textPort.text);
         }
     }
 
-    Button {
-        id: uploadbtn
-        x: 447
-        y: 108
-        text: qsTr("Start")
-        onClicked: {
-        }
-    }
+
 }
